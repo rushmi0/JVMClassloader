@@ -24,15 +24,15 @@ var Plugins = (function() {
       var saveDir = new File(localPath);
       if (!saveDir.exists()) {
         if (saveDir.mkdirs()) {
-          TALON.getLogger().writeInfo("Created directory: " + saveDir.getAbsolutePath());
+          print("Created directory: " + saveDir.getAbsolutePath());
             saveDirPath = saveDir.getAbsolutePath();
             dependsOn("org.jetbrains.kotlin:kotlin-stdlib:2.2.10");
         } else {
-          TALON.getLogger().writeError("Failed to create directory: " + saveDir.getAbsolutePath());
+          print("Failed to create directory: " + saveDir.getAbsolutePath());
           return false;
         }
       } else if (!saveDir.isDirectory()) {
-        TALON.getLogger().writeError("Path exists but is not a directory: " + saveDir.getAbsolutePath());
+        print("Path exists but is not a directory: " + saveDir.getAbsolutePath());
         return false;
       }
 
@@ -43,13 +43,13 @@ var Plugins = (function() {
 
   function dependsOn(coord) {
     if (!saveDirPath) {
-      TALON.getLogger().writeError("Please call addRepository() with a local path before dependsOn().");
+      print("Please call addRepository() with a local path before dependsOn().");
       return false;
     }
 
     var parts = coord.split(":");
     if (parts.length !== 3) {
-      TALON.getLogger().writeError("Invalid coordinate: " + coord);
+      print("Invalid coordinate: " + coord);
       return false;
     }
 
@@ -67,7 +67,7 @@ var Plugins = (function() {
 
     var destPath = Paths.get(saveDir.getAbsolutePath(), jarName);
     if (Files.exists(destPath)) {
-      TALON.addMsg("📦 Already: " + jarName);
+      print("📦 Already: " + jarName);
       return true;
     }
 
@@ -78,23 +78,23 @@ var Plugins = (function() {
         var input = new URL(url).openStream();
         Files.copy(input, destPath);
         input.close();
-        TALON.getLogger().writeInfo("Saved to: " + destPath.toString());
-        TALON.addMsg("✅ Saved: " + artifact);
+        print("Saved to: " + destPath.toString());
+        print("✅ Saved: " + artifact);
         return true;
       } catch(e) {
-        TALON.getLogger().writeError("Failed from: " + repo);
-        TALON.addErrorMsg(">>  Failed from: " + repo);
+        print("Failed from: " + repo);
+        print(">>  Failed from: " + repo);
       }
     }
 
-    TALON.getLogger().writeError("All repositories failed for: " + coord);
+    print("All repositories failed for: " + coord);
     return false;
   }
 
   function load(dir) {
     var folder = new File(dir);
     if (!folder.exists() || !folder.isDirectory()) {
-      TALON.getLogger().writeError("Not found: " + dir);
+      print("Not found: " + dir);
       return false;
     }
 
@@ -106,8 +106,8 @@ var Plugins = (function() {
     }));
 
     if (!jars || jars.length === 0) {
-      TALON.getLogger().writeError("No JARs in: " + dir);
-      TALON.addErrorMsg(">> No JARs in: " + dir);
+      print("No JARs in: " + dir);
+      print(">> No JARs in: " + dir);
       return false;
     }
 
@@ -115,23 +115,23 @@ var Plugins = (function() {
       var urls = [];
       for each(var jar in jars) {
         urls.push(jar.toURI().toURL());
-        TALON.getLogger().writeInfo("JAR: " + jar.getName());
+        print("JAR: " + jar.getName());
       }
 
       loader = new URLClassLoader(urls, Thread.currentThread().getContextClassLoader());
       Thread.currentThread().setContextClassLoader(loader);
 
-      TALON.getLogger().writeInfo(">> Loaded " + urls.length + " JAR(s)");
+      print(">> Loaded " + urls.length + " JAR(s)");
       return true;
     } catch(e) {
-      TALON.getLogger().writeError("Load failed: " + e.message);
+      print("Load failed: " + e.message);
       return false;
     }
   }
 
   function use(target) {
-    if (!load("C:/talon/dependencies")) {
-      TALON.getLogger().writeError(">>Loader not initialized.");
+    if (!load("C:/app/dependencies")) {
+      print(">>Loader not initialized.");
       return null;
     } else {
       try {
@@ -144,8 +144,8 @@ var Plugins = (function() {
           return cls.getDeclaredConstructor().newInstance();
         }
       } catch(e) {
-        TALON.getLogger().writeError(">>Error loading class: " + target);
-        TALON.getLogger().writeError(">> " + e.message);
+        print(">>Error loading class: " + target);
+        print(">> " + e.message);
         return null;
       }
     }
@@ -159,13 +159,13 @@ var Plugins = (function() {
         System.runFinalization();
       }
     } catch(e) {
-      TALON.getLogger().writeError(">> Error closing loader: " + e.message);
+      print(">> Error closing loader: " + e.message);
     } finally {
       loader = null;
       System.gc();
       System.runFinalization();
       Thread.currentThread().setContextClassLoader(null);
-      TALON.getLogger().writeInfo(">> Unloaded class loader");
+      print(">> Unloaded class loader");
     }
   }
 
