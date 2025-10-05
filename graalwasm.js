@@ -20,7 +20,7 @@ var context = Context.newBuilder("wasm")
     )
   )
 */
-var simple = Source.newBuilder("wasm", new URL("file:///C:/talon/graalwasm/build/add-two.wasm")).build();
+var simple = Source.newBuilder("wasm", new URL("file:///C:/app/graalwasm/build/add-two.wasm")).build();
 
 var simpleModule = context.eval(simple);
 var addTwo = simpleModule.getMember("addTwo");
@@ -49,7 +49,7 @@ print("addTwo(40, 2) = " + result.asInt());
        )
     )
 */
-var factoria = Source.newBuilder("wasm",  new URL("file:///C:/talon/graalwasm/build/factorial.wasm")).build();
+var factoria = Source.newBuilder("wasm",  new URL("file:///C:/app/graalwasm/build/factorial.wasm")).build();
 var facModule = context.eval(factoria);
 
 var fac = facModule.getMember("fac");
