@@ -25,9 +25,6 @@ var source = Source.newBuilder("wasm", wasmUrl).build();
 var mainModule = context.eval(source);
 var addTwo = mainModule.getMember("addTwo");
 
-if (addTwo == null) {
-    TALON.addMsg("Function 'addTwo' not found in wasm module.");
-} else {
-    var result = addTwo.execute(40, 2);
-    TALON.addMsg("addTwo(40, 2) = " + result.asInt());
-}
+var result = addTwo.execute(40, 2);
+print("addTwo(40, 2) = " + result.asInt());
+
